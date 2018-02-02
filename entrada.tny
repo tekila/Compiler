@@ -1,0 +1,30 @@
+
+/* Um programa para calcular mdc */
+int gdc (int u, int v)
+{
+   if (v == 0) return u;
+   else return gdc(v,u-u/v*v);
+   /* u-u / v*v == u mod v */
+}
+
+void main(void)
+{
+   int x;
+   int y;
+   x = __sys_input();
+   y = __sys_input();
+   __sys_output(gdc(x,y));
+}
+
+
+
+/*// "//"			{
+					// char c1, c2;
+					// do 
+					// {	
+						// c1 = input();
+						// if(c1 == EOF) break;
+						// if(c1 == '\n') lineno++;
+					
+					// } while(c1!='\n');
+				// }*/
