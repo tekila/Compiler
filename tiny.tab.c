@@ -76,9 +76,10 @@
 
 #define YYSTYPE TreeNode *
 
+static char global[] = "global";
 static char * savedName; /* for use in assignments */
 static char * savedFunction; //For saving function name.
-static char * savedScope; //for saving scope info. Uses [] so the array is allocated on the stack by GCC 
+static char * savedScope = global; //for saving scope info
 static int savedValue; //for saving array size or constant value
 static int savedLineNo;  /* ditto */
 static TreeNode * savedTree; /* stores syntax tree for later return */
@@ -86,7 +87,7 @@ static TreeNode * savedTree; /* stores syntax tree for later return */
 
 
 
-#line 90 "tiny.tab.c" /* yacc.c:339  */
+#line 91 "tiny.tab.c" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -174,7 +175,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 178 "tiny.tab.c" /* yacc.c:358  */
+#line 179 "tiny.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -475,14 +476,14 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,    43,    43,    49,    61,    67,    72,    79,    79,   100,
-     100,   100,   131,   137,   144,   143,   172,   177,   184,   199,
-     205,   218,   217,   232,   245,   258,   263,   275,   280,   285,
-     290,   295,   300,   306,   311,   317,   325,   334,   342,   347,
-     353,   360,   366,   375,   374,   388,   397,   404,   410,   416,
-     422,   428,   434,   441,   452,   458,   465,   472,   483,   490,
-     497,   505,   510,   515,   520,   528,   538,   545,   552,   559,
-     566,   573,   581,   589,   594,   601,   610
+       0,    44,    44,    50,    62,    68,    73,    80,    80,   101,
+     101,   101,   135,   141,   148,   147,   181,   186,   193,   208,
+     215,   229,   228,   244,   257,   270,   275,   287,   292,   297,
+     302,   307,   312,   318,   323,   329,   337,   346,   354,   359,
+     365,   372,   378,   387,   386,   401,   410,   417,   423,   429,
+     435,   441,   447,   454,   465,   471,   478,   485,   496,   503,
+     510,   518,   523,   528,   533,   541,   551,   558,   565,   572,
+     579,   586,   594,   603,   608,   615,   624
 };
 #endif
 
@@ -1337,16 +1338,16 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 44 "tiny.y" /* yacc.c:1646  */
+#line 45 "tiny.y" /* yacc.c:1646  */
     { 
 					if(SintaxDebug)printf("programa -> decl_lista\n");
 					savedTree = (yyvsp[0]);
 				}
-#line 1346 "tiny.tab.c" /* yacc.c:1646  */
+#line 1347 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 3:
-#line 50 "tiny.y" /* yacc.c:1646  */
+#line 51 "tiny.y" /* yacc.c:1646  */
     {
 					if(SintaxDebug)printf("decl_lista -> decl_lista decl\n");
 					TreeNode * t = (yyvsp[-1]);
@@ -1358,53 +1359,53 @@ yyreduce:
 						(yyval) = (yyvsp[-1]); 
 					} else (yyval) = (yyvsp[0]);
                  }
-#line 1362 "tiny.tab.c" /* yacc.c:1646  */
+#line 1363 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 4:
-#line 62 "tiny.y" /* yacc.c:1646  */
+#line 63 "tiny.y" /* yacc.c:1646  */
     { 
 					if(SintaxDebug)printf("decl_lista -> decl\n");
 					(yyval) = (yyvsp[0]); 
 				}
-#line 1371 "tiny.tab.c" /* yacc.c:1646  */
+#line 1372 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 5:
-#line 68 "tiny.y" /* yacc.c:1646  */
+#line 69 "tiny.y" /* yacc.c:1646  */
     {
 					if(SintaxDebug)printf("decl -> var_decl\n");
 					(yyval) = (yyvsp[0]); 
 				}
-#line 1380 "tiny.tab.c" /* yacc.c:1646  */
+#line 1381 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 6:
-#line 73 "tiny.y" /* yacc.c:1646  */
+#line 74 "tiny.y" /* yacc.c:1646  */
     {
 					if(SintaxDebug)printf("decl -> var_decl\n");
 					(yyval) = (yyvsp[0]); 
 				}
-#line 1389 "tiny.tab.c" /* yacc.c:1646  */
+#line 1390 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 7:
-#line 79 "tiny.y" /* yacc.c:1646  */
+#line 80 "tiny.y" /* yacc.c:1646  */
     { savedName = copyString(tokenString); savedLineNo = lineno;}
-#line 1395 "tiny.tab.c" /* yacc.c:1646  */
+#line 1396 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 8:
-#line 80 "tiny.y" /* yacc.c:1646  */
+#line 81 "tiny.y" /* yacc.c:1646  */
     {
-					
 					if(SintaxDebug)printf("var_decl -> tipo ID SEMI\n");
 					TreeNode * t;
 					t = newDeclNode(VarK);
 					t->attr.name = savedName;
 					t->lineno = savedLineNo;
 					t->kind.decl = VarK;
-
+					
+					t->scope = savedScope;
 					
 					t->sibling = (yyval)->sibling;
 					t->child[0] = (yyval)->child[0];
@@ -1416,23 +1417,23 @@ yyreduce:
 					(yyval)->child[1] = NULL;
 					(yyval)->child[2] = NULL;
 				}
-#line 1420 "tiny.tab.c" /* yacc.c:1646  */
+#line 1421 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 9:
-#line 100 "tiny.y" /* yacc.c:1646  */
+#line 101 "tiny.y" /* yacc.c:1646  */
     { savedName = copyString(tokenString); savedLineNo = lineno; }
-#line 1426 "tiny.tab.c" /* yacc.c:1646  */
+#line 1427 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 10:
-#line 100 "tiny.y" /* yacc.c:1646  */
+#line 101 "tiny.y" /* yacc.c:1646  */
     {savedValue = atoi(tokenString);}
-#line 1432 "tiny.tab.c" /* yacc.c:1646  */
+#line 1433 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 101 "tiny.y" /* yacc.c:1646  */
+#line 102 "tiny.y" /* yacc.c:1646  */
     {
 					if(SintaxDebug)printf("var_decl -> tipo ID LSQR NUM RSQR SEMI\n");
 					// if(SintaxDebug) printf("\n*******************\nnome:%s linha:%d valor:%d\n*******************\n", savedName, savedLineNo, savedValue);
@@ -1443,10 +1444,13 @@ yyreduce:
 					t->lineno = savedLineNo;
 					t->kind.decl = ArrayK;
 					
+					t->scope = savedScope;
+					
 					r = newDeclNode(SizeK);
 					r->attr.val = savedValue;
 					r->lineno = savedLineNo;
 					r->kind.decl = SizeK;
+					r->scope = t->scope;
 					
 					t->sibling = (yyval)->sibling;
 					t->child[0] = r;
@@ -1462,40 +1466,41 @@ yyreduce:
 					(yyval)->child[1] = NULL;
 					(yyval)->child[2] = NULL;
 				}
-#line 1466 "tiny.tab.c" /* yacc.c:1646  */
+#line 1470 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 132 "tiny.y" /* yacc.c:1646  */
+#line 136 "tiny.y" /* yacc.c:1646  */
     {
 					if(SintaxDebug)printf("tipo -> INT\n");
 					(yyval) = newTypeNode(Integer);
 					(yyval)->kind.type = Integer;
 				}
-#line 1476 "tiny.tab.c" /* yacc.c:1646  */
+#line 1480 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 13:
-#line 138 "tiny.y" /* yacc.c:1646  */
+#line 142 "tiny.y" /* yacc.c:1646  */
     {if(SintaxDebug)printf("tipo_especificador -> void\n");
 					(yyval) = newTypeNode(Void);
 					(yyval)->kind.type = Void;
 				}
-#line 1485 "tiny.tab.c" /* yacc.c:1646  */
+#line 1489 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 14:
-#line 144 "tiny.y" /* yacc.c:1646  */
+#line 148 "tiny.y" /* yacc.c:1646  */
     { /*toda vez que le um ID ou NUM precisa guardar o nome dele*/
 					savedName = copyString(tokenString);
 					savedLineNo = lineno;
 					savedFunction = savedName;
+					savedScope = savedFunction;
 				}
-#line 1495 "tiny.tab.c" /* yacc.c:1646  */
+#line 1500 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 149 "tiny.y" /* yacc.c:1646  */
+#line 154 "tiny.y" /* yacc.c:1646  */
     {
 					if(SintaxDebug)printf("fun_decl -> tipo_especificador ID LPARE params RPARE comp_decl\n");
 					TreeNode * t;
@@ -1503,6 +1508,10 @@ yyreduce:
 					t->attr.name = savedFunction; 
 					t->lineno = savedLineNo; 
 					t->kind.decl = FunK;
+					
+					
+					t->scope = savedScope;
+					
 
 					t->sibling = (yyval)->sibling;
 					t->child[0] = (yyvsp[-2]);
@@ -1518,30 +1527,30 @@ yyreduce:
 					
 					
 				}
-#line 1522 "tiny.tab.c" /* yacc.c:1646  */
+#line 1531 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 16:
-#line 173 "tiny.y" /* yacc.c:1646  */
+#line 182 "tiny.y" /* yacc.c:1646  */
     {
 					if(SintaxDebug) printf("params -> params_lista\n");
 					(yyval) = (yyvsp[0]);
 				}
-#line 1531 "tiny.tab.c" /* yacc.c:1646  */
+#line 1540 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 17:
-#line 178 "tiny.y" /* yacc.c:1646  */
+#line 187 "tiny.y" /* yacc.c:1646  */
     {
 					if(SintaxDebug)printf("params -> VOID\n");
 					(yyval) = NULL;
 					
 				}
-#line 1541 "tiny.tab.c" /* yacc.c:1646  */
+#line 1550 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 18:
-#line 185 "tiny.y" /* yacc.c:1646  */
+#line 194 "tiny.y" /* yacc.c:1646  */
     {	
 					if(SintaxDebug)printf("params_lista -> params_lista COMMA param\n");
 					TreeNode * t = (yyvsp[-2]);
@@ -1556,20 +1565,21 @@ yyreduce:
 					}
 					
 				}
-#line 1560 "tiny.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 19:
-#line 200 "tiny.y" /* yacc.c:1646  */
-    {if(SintaxDebug)printf("params_lista -> param\n");
-					(yyval) = (yyvsp[0]);
-					
-				}
 #line 1569 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
+  case 19:
+#line 209 "tiny.y" /* yacc.c:1646  */
+    {
+					if(SintaxDebug)printf("params_lista -> param\n");
+					(yyval) = (yyvsp[0]);
+					
+				}
+#line 1579 "tiny.tab.c" /* yacc.c:1646  */
+    break;
+
   case 20:
-#line 206 "tiny.y" /* yacc.c:1646  */
+#line 216 "tiny.y" /* yacc.c:1646  */
     { /*toda vez que le um ID ou NUM precisa guardar o nome dele*/
 					if(SintaxDebug) printf("param -> tipo_especificador ID\n");
 					(yyval) = (yyvsp[-1]);
@@ -1577,23 +1587,24 @@ yyreduce:
 					(yyval)->child[0]->kind.decl = VarParK;
 					(yyval)->child[0]->attr.name = (yyvsp[0])->attr.name;
 					(yyval)->child[0]->lineno = (yyvsp[0])->lineno;
+					(yyval)->child[0]->scope = savedScope;
 					//$$->child[0]->kind.type = $$->kind.type;
 					
 					
 				}
-#line 1585 "tiny.tab.c" /* yacc.c:1646  */
+#line 1596 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 21:
-#line 218 "tiny.y" /* yacc.c:1646  */
+#line 229 "tiny.y" /* yacc.c:1646  */
     { /*toda vez que le um ID ou NUM precisa guardar o nome dele*/
 					savedName = copyString(tokenString);
 				}
-#line 1593 "tiny.tab.c" /* yacc.c:1646  */
+#line 1604 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 22:
-#line 222 "tiny.y" /* yacc.c:1646  */
+#line 233 "tiny.y" /* yacc.c:1646  */
     {
 					if(SintaxDebug)printf("param -> tipo_especificador ID LSQRBRA RSQRBRA\n");
 					TreeNode * t = newDeclNode(ArrayParK);
@@ -1601,13 +1612,14 @@ yyreduce:
 					t->lineno = savedLineNo;
 					(yyval)=(yyvsp[-4]);
 					(yyval)->child[0] = (yyvsp[-3]);
-					(yyval)->child[0]->kind.type = (yyval)->kind.type;
+					//$$->child[0]->kind.type = $$->kind.type;
+					(yyval)->child[0]->scope = savedScope;
 				}
-#line 1607 "tiny.tab.c" /* yacc.c:1646  */
+#line 1619 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 23:
-#line 233 "tiny.y" /* yacc.c:1646  */
+#line 245 "tiny.y" /* yacc.c:1646  */
     {
 					if(SintaxDebug)printf("comp_decl -> LCURBRA decl_local stmt_lista RCURBRA\n");
 					TreeNode * t = (yyvsp[-2]);
@@ -1619,11 +1631,11 @@ yyreduce:
 						(yyval) = (yyvsp[-1]);
 					}	
 				}
-#line 1623 "tiny.tab.c" /* yacc.c:1646  */
+#line 1635 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 24:
-#line 246 "tiny.y" /* yacc.c:1646  */
+#line 258 "tiny.y" /* yacc.c:1646  */
     {
 					if(SintaxDebug)printf("decl_local -> decl_local var_decl\n");
 					TreeNode * t = (yyvsp[-1]);
@@ -1636,20 +1648,20 @@ yyreduce:
 					}				
 					
 				}
-#line 1640 "tiny.tab.c" /* yacc.c:1646  */
+#line 1652 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 25:
-#line 258 "tiny.y" /* yacc.c:1646  */
+#line 270 "tiny.y" /* yacc.c:1646  */
     {	
 					if(SintaxDebug) printf("decl_local-> vazio .\n");
 					(yyval) = NULL;
 				}
-#line 1649 "tiny.tab.c" /* yacc.c:1646  */
+#line 1661 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 26:
-#line 264 "tiny.y" /* yacc.c:1646  */
+#line 276 "tiny.y" /* yacc.c:1646  */
     {
 					if(SintaxDebug)printf("stmt_lista -> stmt_lista stmt\n");
 					TreeNode * t = (yyvsp[-1]);
@@ -1661,83 +1673,83 @@ yyreduce:
 						(yyval) = (yyvsp[0]);
 					}	
 				}
-#line 1665 "tiny.tab.c" /* yacc.c:1646  */
+#line 1677 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 27:
-#line 275 "tiny.y" /* yacc.c:1646  */
+#line 287 "tiny.y" /* yacc.c:1646  */
     {	
 					if(SintaxDebug) printf("local_declaracoes-> vazio .\n");
 					(yyval) = NULL;
 				}
-#line 1674 "tiny.tab.c" /* yacc.c:1646  */
+#line 1686 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 28:
-#line 281 "tiny.y" /* yacc.c:1646  */
+#line 293 "tiny.y" /* yacc.c:1646  */
     {
 					if(SintaxDebug)printf("stmt -> exp_decl\n");
 					(yyval) = (yyvsp[0]);
 				}
-#line 1683 "tiny.tab.c" /* yacc.c:1646  */
+#line 1695 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 29:
-#line 286 "tiny.y" /* yacc.c:1646  */
+#line 298 "tiny.y" /* yacc.c:1646  */
     {
 					if(SintaxDebug)printf("stmt -> comp_decl\n");
 					(yyval) = (yyvsp[0]);
 				}
-#line 1692 "tiny.tab.c" /* yacc.c:1646  */
+#line 1704 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 30:
-#line 291 "tiny.y" /* yacc.c:1646  */
+#line 303 "tiny.y" /* yacc.c:1646  */
     {
 					(yyval) = (yyvsp[0]);
 					if(SintaxDebug)printf("stmt -> selecao_decl\n");
 				}
-#line 1701 "tiny.tab.c" /* yacc.c:1646  */
+#line 1713 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 31:
-#line 296 "tiny.y" /* yacc.c:1646  */
+#line 308 "tiny.y" /* yacc.c:1646  */
     {
 					if(SintaxDebug)printf("stmt -> iteracao_decl\n");
 					(yyval) = (yyvsp[0]);
 				}
-#line 1710 "tiny.tab.c" /* yacc.c:1646  */
+#line 1722 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 32:
-#line 301 "tiny.y" /* yacc.c:1646  */
+#line 313 "tiny.y" /* yacc.c:1646  */
     {
 					if(SintaxDebug)printf("stmt -> retorno_decl\n");
 					(yyval) = (yyvsp[0]);
 				}
-#line 1719 "tiny.tab.c" /* yacc.c:1646  */
+#line 1731 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 33:
-#line 307 "tiny.y" /* yacc.c:1646  */
+#line 319 "tiny.y" /* yacc.c:1646  */
     {
 					if(SintaxDebug)printf("exp_decl -> exp SEMICOLON\n");
 					(yyval) = (yyvsp[-1]);
 				}
-#line 1728 "tiny.tab.c" /* yacc.c:1646  */
+#line 1740 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 34:
-#line 312 "tiny.y" /* yacc.c:1646  */
+#line 324 "tiny.y" /* yacc.c:1646  */
     {
 					if(SintaxDebug)printf("exp_decl -> SEMICOLON\n");
 					(yyval) = (yyvsp[0]);
 				}
-#line 1737 "tiny.tab.c" /* yacc.c:1646  */
+#line 1749 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 35:
-#line 318 "tiny.y" /* yacc.c:1646  */
+#line 330 "tiny.y" /* yacc.c:1646  */
     {	
 					if(SintaxDebug)printf("selecao_decl -> IF LPARE exp RPARE stmt\n");
 					(yyval) = newStmtNode(IfK);
@@ -1745,11 +1757,11 @@ yyreduce:
 					(yyval)->child[1] = (yyvsp[0]);
 					
 				}
-#line 1749 "tiny.tab.c" /* yacc.c:1646  */
+#line 1761 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 36:
-#line 326 "tiny.y" /* yacc.c:1646  */
+#line 338 "tiny.y" /* yacc.c:1646  */
     {
 					(yyval) = newStmtNode(IfK);
 					(yyval)->child[0] = (yyvsp[-4]);
@@ -1757,81 +1769,81 @@ yyreduce:
 					(yyval)->child[2] = (yyvsp[0]);
 					if(SintaxDebug) printf("selecao_decl -> IF LPARE exp RPARE stmt ELSE stmt\n");
 				}
-#line 1761 "tiny.tab.c" /* yacc.c:1646  */
+#line 1773 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 37:
-#line 335 "tiny.y" /* yacc.c:1646  */
+#line 347 "tiny.y" /* yacc.c:1646  */
     {if(SintaxDebug)printf("iteracao_decl -> WHILE LPARE exp RPARE stmt\n");
 					(yyval) = newStmtNode(WhileK);
 					(yyval)->child[0] = (yyvsp[-2]);
 					(yyval)->child[1] = (yyvsp[0]);
 					
 				}
-#line 1772 "tiny.tab.c" /* yacc.c:1646  */
+#line 1784 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 38:
-#line 343 "tiny.y" /* yacc.c:1646  */
+#line 355 "tiny.y" /* yacc.c:1646  */
     {if(SintaxDebug)printf("retorno_decl -> RETURN SEMICOLON\n");
 					(yyval) = newStmtNode(ReturnK);
 					(yyval)->child[0] = NULL;
 				}
-#line 1781 "tiny.tab.c" /* yacc.c:1646  */
+#line 1793 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 39:
-#line 348 "tiny.y" /* yacc.c:1646  */
+#line 360 "tiny.y" /* yacc.c:1646  */
     {if(SintaxDebug)printf("retorno_decl -> RETURN exp SEMICOLON\n");
 					(yyval) = newStmtNode(ReturnK);
 					(yyval)->child[0] = (yyvsp[-1]);
 				}
-#line 1790 "tiny.tab.c" /* yacc.c:1646  */
+#line 1802 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 40:
-#line 354 "tiny.y" /* yacc.c:1646  */
+#line 366 "tiny.y" /* yacc.c:1646  */
     {if(SintaxDebug)printf("exp -> var ASSIGN exp\n");
 					(yyval) = newStmtNode(AssignK);
 					(yyval)->child[0] = (yyvsp[-2]);
 					(yyval)->child[1] = (yyvsp[0]);
 					(yyval)->kind.type = (yyvsp[-2])->kind.type;
 				}
-#line 1801 "tiny.tab.c" /* yacc.c:1646  */
+#line 1813 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 41:
-#line 361 "tiny.y" /* yacc.c:1646  */
+#line 373 "tiny.y" /* yacc.c:1646  */
     {
 					if(SintaxDebug)printf("exp -> exp_simp\n");	
 					(yyval) = (yyvsp[0]);
 				}
-#line 1810 "tiny.tab.c" /* yacc.c:1646  */
+#line 1822 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 42:
-#line 367 "tiny.y" /* yacc.c:1646  */
+#line 379 "tiny.y" /* yacc.c:1646  */
     { /*toda vez que le um ID ou NUM precisa guardar o nome dele*/
 					if(SintaxDebug) printf("var -> ID\n");
 					(yyval) = newExpNode(IdK);
 					(yyval)->kind.exp = IdK;
 					(yyval)->attr.name = copyString(tokenString);	
-					
+					(yyval)->scope = savedScope;
 				}
-#line 1822 "tiny.tab.c" /* yacc.c:1646  */
+#line 1834 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 43:
-#line 375 "tiny.y" /* yacc.c:1646  */
+#line 387 "tiny.y" /* yacc.c:1646  */
     { /*toda vez que le um ID ou NUM precisa guardar o nome dele*/
 					savedName = copyString(tokenString);
 					savedLineNo = lineno;
 				}
-#line 1831 "tiny.tab.c" /* yacc.c:1646  */
+#line 1843 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 44:
-#line 379 "tiny.y" /* yacc.c:1646  */
+#line 391 "tiny.y" /* yacc.c:1646  */
     {
 					if(SintaxDebug)printf("var -> ID LSQRBRA exp RSQRBRA\n");
 					(yyval) = newExpNode(IdArrayK);
@@ -1839,12 +1851,13 @@ yyreduce:
 					(yyval)->attr.name = savedName;
 					(yyval)->lineno = savedLineNo;
 					(yyval)->child[0] = (yyvsp[-1]);
+					(yyval)->scope = savedScope;
 				}
-#line 1844 "tiny.tab.c" /* yacc.c:1646  */
+#line 1857 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 45:
-#line 389 "tiny.y" /* yacc.c:1646  */
+#line 402 "tiny.y" /* yacc.c:1646  */
     {
 					if(SintaxDebug)printf("exp_simp -> exp_soma relacional exp_soma\n");
 					(yyval) = newExpNode(OpK);
@@ -1853,81 +1866,81 @@ yyreduce:
 					(yyval)->child[1] = (yyvsp[0]);
 					
 				}
-#line 1857 "tiny.tab.c" /* yacc.c:1646  */
+#line 1870 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 46:
-#line 398 "tiny.y" /* yacc.c:1646  */
+#line 411 "tiny.y" /* yacc.c:1646  */
     {
 					if(SintaxDebug)printf("exp_simp -> exp_soma\n");
 					(yyval) = (yyvsp[0]);
 					
 				}
-#line 1867 "tiny.tab.c" /* yacc.c:1646  */
+#line 1880 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 47:
-#line 405 "tiny.y" /* yacc.c:1646  */
+#line 418 "tiny.y" /* yacc.c:1646  */
     {
 					if(SintaxDebug)printf("relacional -> LESSEQ\n");
 					(yyval) = newExpNode(OpK);
 					(yyval)->attr.op = LTE;
 				}
-#line 1877 "tiny.tab.c" /* yacc.c:1646  */
+#line 1890 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 48:
-#line 411 "tiny.y" /* yacc.c:1646  */
+#line 424 "tiny.y" /* yacc.c:1646  */
     {
 					if(SintaxDebug)printf("relacional -> LESS\n");
 					(yyval) = newExpNode(OpK);
 					(yyval)->attr.op = LT;
 				}
-#line 1887 "tiny.tab.c" /* yacc.c:1646  */
+#line 1900 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 49:
-#line 417 "tiny.y" /* yacc.c:1646  */
+#line 430 "tiny.y" /* yacc.c:1646  */
     {
 					if(SintaxDebug)printf("relacional -> GREAT\n");
 					(yyval) = newExpNode(OpK);
 					(yyval)->attr.op = GT;
 				}
-#line 1897 "tiny.tab.c" /* yacc.c:1646  */
+#line 1910 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 50:
-#line 423 "tiny.y" /* yacc.c:1646  */
+#line 436 "tiny.y" /* yacc.c:1646  */
     {
 					if(SintaxDebug)printf("relacional -> GREATEQ\n");
 					(yyval) = newExpNode(OpK);
 					(yyval)->attr.op = GTE;
 				}
-#line 1907 "tiny.tab.c" /* yacc.c:1646  */
+#line 1920 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 51:
-#line 429 "tiny.y" /* yacc.c:1646  */
+#line 442 "tiny.y" /* yacc.c:1646  */
     {
 					if(SintaxDebug)printf("relacional -> EQ\n");
 					(yyval) = newExpNode(OpK);
 					(yyval)->attr.op = EQ;
 				}
-#line 1917 "tiny.tab.c" /* yacc.c:1646  */
+#line 1930 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 52:
-#line 435 "tiny.y" /* yacc.c:1646  */
+#line 448 "tiny.y" /* yacc.c:1646  */
     {
 					if(SintaxDebug)printf("relacional -> NEQ\n");
 					(yyval) = newExpNode(OpK);
 					(yyval)->attr.op = NEQ;
 				}
-#line 1927 "tiny.tab.c" /* yacc.c:1646  */
+#line 1940 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 53:
-#line 442 "tiny.y" /* yacc.c:1646  */
+#line 455 "tiny.y" /* yacc.c:1646  */
     {
 					if(SintaxDebug)printf("exp_soma -> exp_soma soma termo\n");
 					(yyval) = (yyvsp[-1]);
@@ -1938,41 +1951,41 @@ yyreduce:
 					(yyval)->child[0] = (yyvsp[-2]);
 					(yyval)->child[1] = (yyvsp[0]);
 				}
-#line 1942 "tiny.tab.c" /* yacc.c:1646  */
+#line 1955 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 54:
-#line 453 "tiny.y" /* yacc.c:1646  */
+#line 466 "tiny.y" /* yacc.c:1646  */
     {
 					if(SintaxDebug) printf("exp_soma -> termo\n");
 					(yyval) = (yyvsp[0]);
 				}
-#line 1951 "tiny.tab.c" /* yacc.c:1646  */
+#line 1964 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 55:
-#line 459 "tiny.y" /* yacc.c:1646  */
+#line 472 "tiny.y" /* yacc.c:1646  */
     {
 					if(SintaxDebug) printf("soma -> PLUS\n");
 					(yyval) = newExpNode(OpK);
 					(yyval)->attr.op = PLUS;	
 					
 				}
-#line 1962 "tiny.tab.c" /* yacc.c:1646  */
+#line 1975 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 56:
-#line 466 "tiny.y" /* yacc.c:1646  */
+#line 479 "tiny.y" /* yacc.c:1646  */
     {
 					(yyval) = newExpNode(OpK);
 					if(SintaxDebug)printf("soma -> PLUS\n");
 					(yyval)->attr.op = MINUS;
 				}
-#line 1972 "tiny.tab.c" /* yacc.c:1646  */
+#line 1985 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 57:
-#line 473 "tiny.y" /* yacc.c:1646  */
+#line 486 "tiny.y" /* yacc.c:1646  */
     {
 					if(SintaxDebug)printf("termo -> termo mult fator\n");
 					(yyval) = (yyvsp[-1]);
@@ -1983,81 +1996,81 @@ yyreduce:
 					(yyval)->child[0] = (yyvsp[-2]);
 					(yyval)->child[1] = (yyvsp[0]);
 				}
-#line 1987 "tiny.tab.c" /* yacc.c:1646  */
+#line 2000 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 58:
-#line 484 "tiny.y" /* yacc.c:1646  */
+#line 497 "tiny.y" /* yacc.c:1646  */
     {
 					if(SintaxDebug) printf("termo -> fator\n");
 					(yyval) = (yyvsp[0]);
 					
 				}
-#line 1997 "tiny.tab.c" /* yacc.c:1646  */
+#line 2010 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 59:
-#line 491 "tiny.y" /* yacc.c:1646  */
+#line 504 "tiny.y" /* yacc.c:1646  */
     {
 					(yyval) = newExpNode(OpK);
 					if(SintaxDebug)printf("mult -> MULT\n");
 					(yyval)->attr.op = TIMES;
 					
 				}
-#line 2008 "tiny.tab.c" /* yacc.c:1646  */
+#line 2021 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 60:
-#line 498 "tiny.y" /* yacc.c:1646  */
+#line 511 "tiny.y" /* yacc.c:1646  */
     {
 					(yyval) = newExpNode(OpK);
 					if(SintaxDebug)printf("mult -> DIV\n");
 					(yyval)->attr.op = OVER;
 					
 				}
-#line 2019 "tiny.tab.c" /* yacc.c:1646  */
+#line 2032 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 61:
-#line 506 "tiny.y" /* yacc.c:1646  */
+#line 519 "tiny.y" /* yacc.c:1646  */
     {
 					if(SintaxDebug)printf("fator -> LPARE exp RPARE\n");
 					(yyval) = (yyvsp[-1]);
 				}
-#line 2028 "tiny.tab.c" /* yacc.c:1646  */
+#line 2041 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 62:
-#line 511 "tiny.y" /* yacc.c:1646  */
+#line 524 "tiny.y" /* yacc.c:1646  */
     {
 					if(SintaxDebug)printf("fator -> var\n");
 					(yyval) = (yyvsp[0]);
 				}
-#line 2037 "tiny.tab.c" /* yacc.c:1646  */
+#line 2050 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 63:
-#line 516 "tiny.y" /* yacc.c:1646  */
+#line 529 "tiny.y" /* yacc.c:1646  */
     {
 					if(SintaxDebug)printf("fator -> ativacao\n");
 					(yyval) = (yyvsp[0]);
 				}
-#line 2046 "tiny.tab.c" /* yacc.c:1646  */
+#line 2059 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 64:
-#line 521 "tiny.y" /* yacc.c:1646  */
+#line 534 "tiny.y" /* yacc.c:1646  */
     {
 					if(SintaxDebug)printf("fator -> NUM\n");
 					(yyval) = newExpNode(ConstK);
 					(yyval)->kind.exp = ConstK;
 					(yyval)->attr.val = atoi(tokenString);
 				}
-#line 2057 "tiny.tab.c" /* yacc.c:1646  */
+#line 2070 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 65:
-#line 529 "tiny.y" /* yacc.c:1646  */
+#line 542 "tiny.y" /* yacc.c:1646  */
     {	
 					if(SintaxDebug) printf("ativacao -> ID LPARE args RPARE\n");
 					(yyval) = newExpNode(IdK);
@@ -2065,106 +2078,107 @@ yyreduce:
 					(yyval)->attr.name = (yyvsp[-3])->attr.name;
 					(yyval)->lineno = (yyvsp[-3])->lineno;
 					(yyval)->child[0] = (yyvsp[-1]);
-
+					(yyval)->scope = savedScope;
 				}
-#line 2071 "tiny.tab.c" /* yacc.c:1646  */
+#line 2084 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 66:
-#line 539 "tiny.y" /* yacc.c:1646  */
+#line 552 "tiny.y" /* yacc.c:1646  */
     {
 					if(SintaxDebug) printf("ativacao -> chamada_sistema\n");
 					(yyval) = (yyvsp[0]);
 				}
-#line 2080 "tiny.tab.c" /* yacc.c:1646  */
+#line 2093 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 67:
-#line 546 "tiny.y" /* yacc.c:1646  */
+#line 559 "tiny.y" /* yacc.c:1646  */
     {
 					if(SintaxDebug) printf("chamada_sistema -> SYS_INPUT\n");
 					(yyval) = newSysNode(InputK);
 					(yyval)->attr.name = "input";
 					(yyval)->lineno = lineno;
 				}
-#line 2091 "tiny.tab.c" /* yacc.c:1646  */
+#line 2104 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 68:
-#line 553 "tiny.y" /* yacc.c:1646  */
+#line 566 "tiny.y" /* yacc.c:1646  */
     {
 					if(SintaxDebug) printf("chamada_sistema -> SYS_OUTPUT\n");
 					(yyval) = newSysNode(OutputK);
 					(yyval)->attr.name = "output";
 					(yyval)->lineno = lineno;
 				}
-#line 2102 "tiny.tab.c" /* yacc.c:1646  */
+#line 2115 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 69:
-#line 560 "tiny.y" /* yacc.c:1646  */
+#line 573 "tiny.y" /* yacc.c:1646  */
     {
 					if(SintaxDebug) printf("chamada_sistema -> SYS_KILL\n");
 					(yyval) = newSysNode(KillK);
 					(yyval)->attr.name = "kill";
 					(yyval)->lineno = lineno;
 				}
-#line 2113 "tiny.tab.c" /* yacc.c:1646  */
+#line 2126 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 70:
-#line 567 "tiny.y" /* yacc.c:1646  */
+#line 580 "tiny.y" /* yacc.c:1646  */
     {
 					if(SintaxDebug) printf("chamada_sistema -> SYS_RUN\n");
 					(yyval) = newSysNode(RunK);
 					(yyval)->attr.name = "run";
 					(yyval)->lineno = lineno;
 				}
-#line 2124 "tiny.tab.c" /* yacc.c:1646  */
+#line 2137 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 71:
-#line 574 "tiny.y" /* yacc.c:1646  */
+#line 587 "tiny.y" /* yacc.c:1646  */
     {
 					if(SintaxDebug) printf("chamada_sistema -> SYS_SAVE\n");
 					(yyval) = newSysNode(SaveK);
 					(yyval)->attr.name = "save";
 					(yyval)->lineno = lineno;
 				}
-#line 2135 "tiny.tab.c" /* yacc.c:1646  */
+#line 2148 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 72:
-#line 582 "tiny.y" /* yacc.c:1646  */
+#line 595 "tiny.y" /* yacc.c:1646  */
     {
 				(yyval) = newExpNode(IdK);
 				(yyval)->attr.name = copyString(tokenString);
 				savedName = copyString(tokenString);
 				(yyval)->lineno = lineno;
+				(yyval)->scope = savedScope;
 			}
-#line 2146 "tiny.tab.c" /* yacc.c:1646  */
+#line 2160 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 73:
-#line 590 "tiny.y" /* yacc.c:1646  */
+#line 604 "tiny.y" /* yacc.c:1646  */
     {
 					if(SintaxDebug)printf("args -> list_args\n");
 					(yyval) = (yyvsp[0]);
 				}
-#line 2155 "tiny.tab.c" /* yacc.c:1646  */
+#line 2169 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 74:
-#line 594 "tiny.y" /* yacc.c:1646  */
+#line 608 "tiny.y" /* yacc.c:1646  */
     {
 					if(SintaxDebug) printf("args -> vazio");
 					(yyval) = NULL;
 				}
-#line 2164 "tiny.tab.c" /* yacc.c:1646  */
+#line 2178 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 75:
-#line 602 "tiny.y" /* yacc.c:1646  */
+#line 616 "tiny.y" /* yacc.c:1646  */
     {
 					if(SintaxDebug)printf("list_args -> list_args COMMA exp\n");
 					TreeNode * t = (yyvsp[0]);
@@ -2173,20 +2187,20 @@ yyreduce:
 					(yyval)->sibling = t;
 					
 				}
-#line 2177 "tiny.tab.c" /* yacc.c:1646  */
+#line 2191 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
   case 76:
-#line 611 "tiny.y" /* yacc.c:1646  */
+#line 625 "tiny.y" /* yacc.c:1646  */
     {
 					if(SintaxDebug)printf("list_args -> exp\n");
 					(yyval) = (yyvsp[0]);
 				}
-#line 2186 "tiny.tab.c" /* yacc.c:1646  */
+#line 2200 "tiny.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 2190 "tiny.tab.c" /* yacc.c:1646  */
+#line 2204 "tiny.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2414,7 +2428,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 617 "tiny.y" /* yacc.c:1906  */
+#line 631 "tiny.y" /* yacc.c:1906  */
 
 
 int yyerror(char * message)
@@ -2435,33 +2449,4 @@ TreeNode * parse(void)
 }
 
 
-/* Scope changes are function bound only. 
- * We`re not dealing here with scope changes on control/loop statements.
- */
-void scoper(TreeNode* root)
-{ 
-	char globalScope[] = "global";
-	savedScope = globalScope;
-	if(SintaxDebug) printf("inside scoper\n");
-	while(root!=NULL) //condition for not bugging.
-	{	
-		if(root->nodekind == DeclK) //root is a declaration
-		{
-			if(root->kind.decl == FunK) //root is a declaration of a function, savedScope must change.
-			{
-				printf("root->attr.name: %s\n", root->attr.name);
-				
-				char dot[100] = ".";
-				char* aux;
-				aux = strcat(dot, root->attr.name);
-				savedScope = strcat(savedScope, aux);
-				printf("savedScope: %s\n", savedScope);
-				if(SintaxDebug) printf("Scope updated\n");
-			}
-		}
-		for(int i = 0; i<MAXCHILDREN; i++)
-			scoper(root->child[i]);
-		root = root->sibling;
-	}
-}
 

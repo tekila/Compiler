@@ -73,7 +73,7 @@ int main( int argc, char * argv[] )
 	while (getToken()!=ENDFILE);
 	#else
 	syntaxTree = parse();
-	scoper(syntaxTree);
+	//scoper(syntaxTree);
 	if (TraceParse) {
 		fprintf(listing,"\nSyntax tree:\n");
 		printTree(syntaxTree);

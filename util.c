@@ -229,10 +229,10 @@ void printTree( TreeNode * tree )
 					fprintf(listing,"Const: %d\n",tree->attr.val);
 					break;
 				case IdK:
-					fprintf(listing,"Id: %s\n",tree->attr.name);
+					fprintf(listing,"Id: %s at Scope:: %s\n",tree->attr.name, tree->scope);
 					break;
 				case IdArrayK:
-					fprintf(listing,"IdArrayK: %s\n",tree->attr.name);
+					fprintf(listing,"IdArrayK: %s at Scope:: %s\n",tree->attr.name, tree->scope);
 					break;
 				default:
 					fprintf(listing,"2Unknown ExpNode kind\n");
@@ -267,22 +267,22 @@ void printTree( TreeNode * tree )
 		{ 
 			switch (tree->kind.decl) {
 				case VarK:
-					fprintf(listing,"VarK: %s - \n", tree->attr.name);
+					fprintf(listing,"VarK: %s at Scope:: %s\n", tree->attr.name, tree->scope);
 					break;
 				case ArrayK:
-					fprintf(listing,"ArrayK: %s - \n", tree->attr.name);
+					fprintf(listing,"ArrayK: %s at Scope:: %s\n", tree->attr.name, tree->scope);
 					break;
 				case FunK:
-					fprintf(listing,"FunK: %s - \n", tree->attr.name);
+					fprintf(listing,"FunK: %s at Scope:: %s\n", tree->attr.name, tree->scope);
 					break;;
 				case VarParK:
-					fprintf(listing,"VarParK: %s - \n", tree->attr.name);
+					fprintf(listing,"VarParK: %s at Scope:: %s\n", tree->attr.name, tree->scope);
 					break;
 				case ArrayParK:
-					fprintf(listing,"ArrayParK: %s - \n", tree->attr.name);
+					fprintf(listing,"ArrayParK: %s at Scope:: %s\n", tree->attr.name, tree->scope);
 					break;
 				case SizeK:
-					fprintf(listing,"SizeK: %d - \n", tree->attr.val);
+					fprintf(listing,"SizeK: %d at Scope:: %s\n", tree->attr.val, tree->scope);
 					break;
 				default:
 					fprintf(listing,"4Unknown ExpNode kind\n");

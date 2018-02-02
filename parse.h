@@ -12,9 +12,4 @@
  */
 TreeNode * parse(void);
 
-/* Function scoper operates on the SavedTree from tiny.y 
- * to retrieve scope info for each and every case necessary.
- */
-void scoper(TreeNode* root); 
-
 #endif

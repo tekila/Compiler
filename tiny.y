@@ -17,9 +17,10 @@
 
 #define YYSTYPE TreeNode *
 
+static char global[] = "global";
 static char * savedName; /* for use in assignments */
 static char * savedFunction; //For saving function name.
-static char * savedScope; //for saving scope info. Uses [] so the array is allocated on the stack by GCC 
+static char * savedScope = global; //for saving scope info
 static int savedValue; //for saving array size or constant value
 static int savedLineNo;  /* ditto */
 static TreeNode * savedTree; /* stores syntax tree for later return */
@@ -78,14 +79,14 @@ decl 			: var_decl
 				/*toda vez que le um ID precisa guardar o nome dele*/
 var_decl		: tipo ID { savedName = copyString(tokenString); savedLineNo = lineno;} SEMI
 				{
-					
 					if(SintaxDebug)printf("var_decl -> tipo ID SEMI\n");
 					TreeNode * t;
 					t = newDeclNode(VarK);
 					t->attr.name = savedName;
 					t->lineno = savedLineNo;
 					t->kind.decl = VarK;
-
+					
+					t->scope = savedScope;
 					
 					t->sibling = $$->sibling;
 					t->child[0] = $$->child[0];
@@ -108,10 +109,13 @@ var_decl		: tipo ID { savedName = copyString(tokenString); savedLineNo = lineno;
 					t->lineno = savedLineNo;
 					t->kind.decl = ArrayK;
 					
+					t->scope = savedScope;
+					
 					r = newDeclNode(SizeK);
 					r->attr.val = savedValue;
 					r->lineno = savedLineNo;
 					r->kind.decl = SizeK;
+					r->scope = t->scope;
 					
 					t->sibling = $$->sibling;
 					t->child[0] = r;
@@ -145,6 +149,7 @@ fun_decl	: tipo ID
 					savedName = copyString(tokenString);
 					savedLineNo = lineno;
 					savedFunction = savedName;
+					savedScope = savedFunction;
 				} LPAREN params RPAREN comp_decl
 				{
 					if(SintaxDebug)printf("fun_decl -> tipo_especificador ID LPARE params RPARE comp_decl\n");
@@ -153,6 +158,10 @@ fun_decl	: tipo ID
 					t->attr.name = savedFunction; 
 					t->lineno = savedLineNo; 
 					t->kind.decl = FunK;
+					
+					
+					t->scope = savedScope;
+					
 
 					t->sibling = $$->sibling;
 					t->child[0] = $5;
@@ -197,7 +206,8 @@ params_lista: params_lista COMMA param
 					
 				}
 			| param
-				{if(SintaxDebug)printf("params_lista -> param\n");
+				{
+					if(SintaxDebug)printf("params_lista -> param\n");
 					$$ = $1;
 					
 				}
@@ -210,7 +220,8 @@ param 		: tipo id
 					$$->child[0]->kind.decl = VarParK;
 					$$->child[0]->attr.name = $2->attr.name;
 					$$->child[0]->lineno = $2->lineno;
-					//$$->child[0]->kind.type = $$->kind.type;
+					$$->child[0]->scope = savedScope;
+					
 					
 					
 				}
@@ -226,7 +237,7 @@ param 		: tipo id
 					t->lineno = savedLineNo;
 					$$=$1;
 					$$->child[0] = $2;
-					$$->child[0]->kind.type = $$->kind.type;
+					$$->child[0]->scope = savedScope;
 				}
 			;
 comp_decl	: LCURLY decl_local stmt_lista RCURLY
@@ -369,7 +380,7 @@ var			: ID
 					$$ = newExpNode(IdK);
 					$$->kind.exp = IdK;
 					$$->attr.name = copyString(tokenString);	
-					
+					$$->scope = savedScope;
 				}
 			| ID 
 				{ /*toda vez que le um ID ou NUM precisa guardar o nome dele*/
@@ -383,6 +394,7 @@ var			: ID
 					$$->attr.name = savedName;
 					$$->lineno = savedLineNo;
 					$$->child[0] = $4;
+					$$->scope = savedScope;
 				}
 			;
 exp_simp	: exp_soma relacional exp_soma
@@ -533,7 +545,7 @@ ativacao	: id LPAREN args RPAREN
 					$$->attr.name = $1->attr.name;
 					$$->lineno = $1->lineno;
 					$$->child[0] = $3;
-
+					$$->scope = savedScope;
 				}
 			| chamada_sistema 
 				{
@@ -584,6 +596,7 @@ id			: ID
 				$$->attr.name = copyString(tokenString);
 				savedName = copyString(tokenString);
 				$$->lineno = lineno;
+				$$->scope = savedScope;
 			}
 			;
 args		: list_args
@@ -634,33 +647,4 @@ TreeNode * parse(void)
 }
 
 
-/* Scope changes are function bound only. 
- * We`re not dealing here with scope changes on control/loop statements.
- */
-void scoper(TreeNode* root)
-{ 
-	char globalScope[] = "global";
-	savedScope = globalScope;
-	if(SintaxDebug) printf("inside scoper\n");
-	while(root!=NULL) //condition for not bugging.
-	{	
-		if(root->nodekind == DeclK) //root is a declaration
-		{
-			if(root->kind.decl == FunK) //root is a declaration of a function, savedScope must change.
-			{
-				printf("root->attr.name: %s\n", root->attr.name);
-				
-				char dot[100] = "."; //must be array of char because char* creates a read-only, which is not useful
-				char* aux;
-				aux = strcat(dot, root->attr.name);
-				savedScope = strcat(savedScope, aux);
-				printf("savedScope: %s\n", savedScope);
-				if(SintaxDebug) printf("Scope updated\n");
-			}
-		}
-		for(int i = 0; i<MAXCHILDREN; i++)
-			scoper(root->child[i]);
-		root = root->sibling;
-	}
-}
 
