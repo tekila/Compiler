@@ -86,6 +86,8 @@ var_decl		: tipo ID { savedName = copyString(tokenString); savedLineNo = lineno;
 					t->lineno = savedLineNo;
 					t->kind.decl = VarK;
 					
+					t->Type = $$->Type;
+					
 					t->scope = savedScope;
 					
 					t->sibling = $$->sibling;
@@ -97,6 +99,7 @@ var_decl		: tipo ID { savedName = copyString(tokenString); savedLineNo = lineno;
 					$$->child[0] = t;
 					$$->child[1] = NULL;
 					$$->child[2] = NULL;
+					$$->child[0]->Type = $$->Type;
 				}
 				| tipo ID { savedName = copyString(tokenString); savedLineNo = lineno; } LSQR NUM {savedValue = atoi(tokenString);} RSQR SEMI
 				{
@@ -108,7 +111,7 @@ var_decl		: tipo ID { savedName = copyString(tokenString); savedLineNo = lineno;
 					t->attr.name = savedName; 
 					t->lineno = savedLineNo;
 					t->kind.decl = ArrayK;
-					
+					t->Type = $1->Type;
 					t->scope = savedScope;
 					
 					r = newDeclNode(SizeK);
@@ -116,7 +119,7 @@ var_decl		: tipo ID { savedName = copyString(tokenString); savedLineNo = lineno;
 					r->lineno = savedLineNo;
 					r->kind.decl = SizeK;
 					r->scope = t->scope;
-					
+					r->Type = Integer;
 					t->sibling = $$->sibling;
 					t->child[0] = r;
 					t->child[1] = NULL;
@@ -130,6 +133,7 @@ var_decl		: tipo ID { savedName = copyString(tokenString); savedLineNo = lineno;
 					$$->child[0] = t;
 					$$->child[1] = NULL;
 					$$->child[2] = NULL;
+					$$->child[0]->Type = $$->Type;
 				}
 			;
 tipo 			:INT
@@ -137,11 +141,13 @@ tipo 			:INT
 					if(SintaxDebug)printf("tipo -> INT\n");
 					$$ = newTypeNode(Integer);
 					$$->kind.type = Integer;
+					$$->Type = Integer;
 				}
 				|	VOID
 				{if(SintaxDebug)printf("tipo_especificador -> void\n");
 					$$ = newTypeNode(Void);
 					$$->kind.type = Void;
+					$$->Type = Void;
 				}
 			;
 fun_decl	: tipo ID
@@ -172,6 +178,7 @@ fun_decl	: tipo ID
 					$$->child[0] = t;
 					$$->child[1] = NULL;
 					$$->child[2] = NULL;
+					$$->child[0]->Type = $$->Type;
 					
 
 					
@@ -221,7 +228,7 @@ param 		: tipo id
 					$$->child[0]->attr.name = $2->attr.name;
 					$$->child[0]->lineno = $2->lineno;
 					$$->child[0]->scope = savedScope;
-					
+					$$->child[0]->Type = $$->Type;
 					
 					
 				}
@@ -238,6 +245,7 @@ param 		: tipo id
 					$$=$1;
 					$$->child[0] = $2;
 					$$->child[0]->scope = savedScope;
+					$$->child[0]->Type = $$->Type;
 				}
 			;
 comp_decl	: LCURLY decl_local stmt_lista RCURLY
@@ -366,7 +374,7 @@ exp			: var ASSIGN exp
 					$$ = newStmtNode(AssignK);
 					$$->child[0] = $1;
 					$$->child[1] = $3;
-					$$->kind.type = $1->kind.type;
+					$$->Type = $1->Type;
 				}
 			| exp_simp
 				{
@@ -381,6 +389,7 @@ var			: ID
 					$$->kind.exp = IdK;
 					$$->attr.name = copyString(tokenString);	
 					$$->scope = savedScope;
+					$$->Type = Integer;
 				}
 			| ID 
 				{ /*toda vez que le um ID ou NUM precisa guardar o nome dele*/
@@ -395,6 +404,7 @@ var			: ID
 					$$->lineno = savedLineNo;
 					$$->child[0] = $4;
 					$$->scope = savedScope;
+					$$->Type = Integer;
 				}
 			;
 exp_simp	: exp_soma relacional exp_soma
@@ -454,10 +464,10 @@ exp_soma	: exp_soma soma termo
 				{
 					if(SintaxDebug)printf("exp_soma -> exp_soma soma termo\n");
 					$$ = $2;
-					if($1->kind.type == Integer && $3->kind.type == Integer)
-					{
-						$2->kind.type = Integer;
-					}
+					// if($1->kind.type == Integer && $3->kind.type == Integer)
+					// {
+						// $2->kind.type = Integer;
+					// }
 					$$->child[0] = $1;
 					$$->child[1] = $3;
 				}
@@ -485,10 +495,10 @@ termo		: termo mult fator
 				{
 					if(SintaxDebug)printf("termo -> termo mult fator\n");
 					$$ = $2;
-					if($1->kind.type == Integer && $3->kind.type == Integer)
-					{
-						$2->kind.type = Integer;
-					}
+					// if($1->kind.type == Integer && $3->kind.type == Integer)
+					// {
+						// $2->kind.type = Integer;
+					// }
 					$$->child[0] = $1;
 					$$->child[1] = $3;
 				}
@@ -534,6 +544,7 @@ fator		: LPAREN exp RPAREN
 					if(SintaxDebug)printf("fator -> NUM\n");
 					$$ = newExpNode(ConstK);
 					$$->kind.exp = ConstK;
+					$$->Type = Integer;
 					$$->attr.val = atoi(tokenString);
 				}
 			;
@@ -541,7 +552,7 @@ ativacao	: id LPAREN args RPAREN
 				{	
 					if(SintaxDebug) printf("ativacao -> ID LPARE args RPARE\n");
 					$$ = newExpNode(IdK);
-					$$->kind.exp = IdK;
+					$$->kind.exp = FunIdK;
 					$$->attr.name = $1->attr.name;
 					$$->lineno = $1->lineno;
 					$$->child[0] = $3;

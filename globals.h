@@ -67,12 +67,12 @@ extern char*  yytext;
 /***********   Syntax tree for parsing ************/
 /**************************************************/
 
-typedef enum {StmtK,ExpK,SysK,DeclK,TypeK} NodeKind; //tipos de no da arvore
-typedef enum {IfK,WhileK,AssignK,ReturnK,WriteK} StmtKind;
-typedef enum {OpK,ConstK,IdK, IdArrayK} ExpKind;
-typedef enum {InputK, OutputK, KillK, RunK, SaveK} SystemKind;
-typedef enum {Void, Integer} TypeKind;
-typedef enum {VarK, ArrayK, FunK, VarParK, ArrayParK, SizeK} DeclKind;
+typedef enum {StmtK,ExpK,SysK,DeclK,TypeK} 						NodeKind; //tipos de no da arvore
+typedef enum {IfK,WhileK,AssignK,ReturnK} 						StmtKind;
+typedef enum {OpK, ConstK, IdK, IdArrayK, FunIdK} 				ExpKind;
+typedef enum {InputK, OutputK, KillK, RunK, SaveK} 				SystemKind;
+typedef enum {Void, Integer} 									TypeKind;
+typedef enum {VarK, ArrayK, FunK, VarParK, ArrayParK, SizeK}	DeclKind;
 
 /* ExpType is used for type checking */
 //typedef enum {Void,Integer,Boolean} ExpType;
@@ -91,6 +91,7 @@ typedef struct treeNode
     union { TokenType op;
              int val;
              char * name; } attr;
+	TypeKind Type;
 } TreeNode;
 
 
@@ -132,4 +133,5 @@ extern int Error;
 
 extern int SintaxDebug;
 extern int GeneralDebug;
+extern int SemanticDebug;
 #endif

@@ -231,6 +231,10 @@ void printTree( TreeNode * tree )
 				case IdK:
 					fprintf(listing,"Id: %s at Scope:: %s\n",tree->attr.name, tree->scope);
 					break;
+				case FunIdK:
+					fprintf(listing,"FunId: %s at Scope:: %s\n",tree->attr.name, tree->scope);
+					break;
+			
 				case IdArrayK:
 					fprintf(listing,"IdArrayK: %s at Scope:: %s\n",tree->attr.name, tree->scope);
 					break;
@@ -267,13 +271,13 @@ void printTree( TreeNode * tree )
 		{ 
 			switch (tree->kind.decl) {
 				case VarK:
-					fprintf(listing,"VarK: %s at Scope:: %s\n", tree->attr.name, tree->scope);
+					fprintf(listing,"VarK: %s at Scope:: %s :: Data type: %s\n", tree->attr.name, tree->scope, (tree->Type == Integer)? "Integer":"Not Integer");
 					break;
 				case ArrayK:
-					fprintf(listing,"ArrayK: %s at Scope:: %s\n", tree->attr.name, tree->scope);
+					fprintf(listing,"ArrayK: %s at Scope:: %s \n", tree->attr.name, tree->scope );
 					break;
 				case FunK:
-					fprintf(listing,"FunK: %s at Scope:: %s\n", tree->attr.name, tree->scope);
+					fprintf(listing,"FunK: %s at Scope:: %s :: Return Type: %s\n", tree->attr.name, tree->scope, (tree->Type == Integer)? "Integer":"Not Integer");
 					break;;
 				case VarParK:
 					fprintf(listing,"VarParK: %s at Scope:: %s\n", tree->attr.name, tree->scope);

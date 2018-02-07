@@ -5,11 +5,25 @@ int gdc(int u, int v)
 	else return gdc (v, u-u/v*v);
 }
 
+void foo(void)
+{
+	
+}
+
 void main (void)
 {
 	int x;
 	int y;
+	int z;
+	void b;
+	int foo;
+	
+	x = foo();
+	
+	z = a();
+	
 	__sys_input();
 	__sys_input();
+	gdc(x, y);
 	__sys_output();
 }
