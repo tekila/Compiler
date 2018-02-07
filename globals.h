@@ -71,7 +71,7 @@ typedef enum {StmtK,ExpK,SysK,DeclK,TypeK} 						NodeKind; //tipos de no da arvo
 typedef enum {IfK,WhileK,AssignK,ReturnK} 						StmtKind;
 typedef enum {OpK, ConstK, IdK, IdArrayK, FunIdK} 				ExpKind;
 typedef enum {InputK, OutputK, KillK, RunK, SaveK} 				SystemKind;
-typedef enum {Void, Integer} 									TypeKind;
+typedef enum {Void, Integer, NotAType} 							TypeKind;
 typedef enum {VarK, ArrayK, FunK, VarParK, ArrayParK, SizeK}	DeclKind;
 
 /* ExpType is used for type checking */

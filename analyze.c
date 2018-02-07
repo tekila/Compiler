@@ -56,6 +56,11 @@ int notNull(TreeNode * t)
 	return 1;
 }
 
+/*
+ * treatChainedOps treats tree nodes composed by multiple expressions
+ * such as var1 = 5+var2*9/var3;
+ */
+
 static int treatChainedOps(TreeNode * t)
 {
 	//child 0 - left tree
@@ -85,7 +90,7 @@ static int treatChainedOps(TreeNode * t)
 			else
 			{
 				//ERROR: typecheck detected something other than Int.
-				fprintf(listing,"ERROR: Operation with void. Line %d:\n", t->lineno);
+				fprintf(listing,"::::ERROR 1:::: Operation with void. Line %d:\n", t->lineno);
 				Error = TRUE;
 				return 0;
 			}
@@ -113,16 +118,24 @@ static void insertNode( TreeNode * t)
 					//On assign, must verify if we are not assigning a void value to an Int;
 					//Child[0] holds left side of assign;
 					//child[1] holds value to be assigned.
-					//If its an operation, acquire the return value from root->Type
+					//If its an operation,ignode because its treated somewhere else
 					//Must also verify if lefthand side is a variable and if its declared.
 					if(t->child[0]->kind.exp == IdK || t->child[0]->kind.exp == IdArrayK) //lefthand side is a variable.
 					{
 						//we now know that the lefthand side is valid
-						if(t->child[1]->Type == Void && t->child[1]->kind.exp!=OpK)
+						if(t->child[1]->kind.exp == FunIdK)
+						{
+							//if the righthand side has a function, then search for the return value in the symbol table
+							TypeKind returnType = st_lookup_type(t->child[1]->attr.name, t->child[1]->scope);
+							if(returnType != Integer){
+								fprintf(listing,"::::ERROR 2-a:::: Integer receiving function void return. Line %d:\n", t->lineno);
+								Error = TRUE;
+							}
+						}
+						else if(t->child[1]->Type == Void && t->child[1]->kind.exp != OpK)
 						{
 							//Invalid assignment, show error
-							printf("%d -------------------\n", t->child[1]->attr.val);
-							fprintf(listing,"ERROR 1: Integer receiving void return. Line %d:\n", t->lineno);
+							fprintf(listing,"::::ERROR 2-b:::: Integer receiving void return. Line %d:\n", t->lineno);
 							Error = TRUE;
 						}
 						
@@ -130,7 +143,7 @@ static void insertNode( TreeNode * t)
 					else
 					{
 						//lefthand side not a variable. Show error.
-						fprintf(listing,"ERROR 2: Lefthand side of ASSIGN is not a variable. Line %d:\n",t->lineno);
+						fprintf(listing,"::::ERROR 3:::: Lefthand side of ASSIGN is not a variable. Line %d:\n",t->lineno);
 						Error = TRUE;
 					}
 					break;
@@ -157,7 +170,7 @@ static void insertNode( TreeNode * t)
 					if(st_lookup(t->attr.name, t->scope) == -1)
 					{
 						//Not in the table. Activation without declaration.
-						fprintf(listing,"ERROR: Variable %s used without declaration. Line %d:\n",t->attr.name, t->lineno);
+						fprintf(listing,"::::ERROR 4:::: Variable %s in %s scope used without declaration. Line %d:\n",t->attr.name, t->scope,  t->lineno);
 						Error = TRUE;
 					}
 					break;
@@ -184,8 +197,7 @@ static void insertNode( TreeNode * t)
 					if( st_lookup_return == -1)
 					{
 						//Not in the table. Activation without declaration.
-						printf("st_lookup_return");
-						fprintf(listing,"ERROR 3: Function %s in %s Scope used without declaration. \nLine: %d\n",t->attr.name, t->scope,  t->lineno);
+						fprintf(listing,"::::ERROR 5:::: Function %s in %s Scope used without declaration. Line: %d\n",t->attr.name, t->scope,  t->lineno);
 						Error = TRUE;
 					}
 					break;
@@ -210,12 +222,12 @@ static void insertNode( TreeNode * t)
 						//found a var declaration. must know if its already in the table.
 						if(st_lookup_return == -2) //theres another variable here with the same scope
 						{
-							fprintf(listing,"ERROR 4: Variable %s uses same name, in the same scope, as another identifier. Line %d:\n",t->attr.name, t->lineno);
+							fprintf(listing,"::::ERROR 6:::: Variable %s uses same name, in the same scope, as another identifier. Line %d:\n",t->attr.name, t->lineno);
 							Error = TRUE;						
 						}
 						if(st_lookup_return == -1) //theres not another variable. must insert
 						{
-							st_insert(t->attr.name, t->scope, t->lineno, location++);
+							st_insert(t->attr.name, t->scope, t->lineno, location++, t->Type);
 						}
 						break;
 					}
@@ -225,23 +237,36 @@ static void insertNode( TreeNode * t)
 						//found a var declaration. must know if its already in the table.
 						if(st_lookup_return == -2) //theres another variable here with the same scope
 						{
-							fprintf(listing,"ERROR 5: Function %s uses same name, in the same scope, as another idenfier. Line %d:\n",t->attr.name, t->lineno);
+							fprintf(listing,"::::ERROR 7:::: Function %s uses same name, in the same scope, as another idenfier. Line %d:\n",t->attr.name, t->lineno);
 							Error = TRUE;						
 						}
 						if(st_lookup_return == -1) //theres not another variable. must insert
 						{
-							st_insert(t->attr.name, t->scope, t->lineno, location++);
+							st_insert(t->attr.name, t->scope, t->lineno, location++,  t->Type);
 							if(SemanticDebug) printf("Function inserted: %s\n", t->attr.name);
 						}
 					}
 				}
 			}
 			break;
-		case TypeK:
-			printf("TODO: Inserting TypeK\n"); break;
+		case TypeK: //should something even be done here??
+			//printf("TODO: Inserting TypeK\n"); break;
 		
 		default:
 		break;
+	}
+}
+
+void verifyMain()
+{
+	int main = st_lookup_main();
+	if(main == -1)
+	{
+		fprintf(listing,"::::ERROR 8-a:::: Function 'main' not found.\n");
+	}
+	if(main == -2)
+	{
+		fprintf(listing,"::::ERROR 8-b:::: Function 'main' not found in global scope.\n");
 	}
 }
 
@@ -251,6 +276,7 @@ static void insertNode( TreeNode * t)
 void buildSymtab(TreeNode * syntaxTree)
 { 
 	traverse(syntaxTree);
+	verifyMain();
 	if (TraceAnalyze)
 	{ 
 		fprintf(listing,"\nSymbol table:\n\n");
@@ -264,58 +290,6 @@ static void typeError(TreeNode * t, char * message)
 	Error = TRUE;
 }
 
-/* Procedure checkNode performs
- * type checking at a single tree node
- */
-static void checkNode(TreeNode * t)
-{ 
-	// switch (t->nodekind)
-  // { case ExpK:
-      // switch (t->kind.exp)
-      // { case OpK:
-          // if ((t->child[0]->type != Integer) ||
-              // (t->child[1]->type != Integer))
-            // typeError(t,"Op applied to non-integer");
-          // if ((t->attr.op == EQ) || (t->attr.op == LT))
-            // t->type = Boolean;
-          // else
-            // t->type = Integer;
-          // break;
-        // case ConstK:
-        // case IdK:
-          // t->type = Integer;
-          // break;
-        // default:
-          // break;
-      // }
-      // break;
-    // case StmtK:
-      // switch (t->kind.stmt)
-      // { case IfK:
-          // if (t->child[0]->type == Integer)
-            // typeError(t->child[0],"if test is not Boolean");
-          // break;
-        // case AssignK:
-          // if (t->child[0]->type != Integer)
-            // typeError(t->child[0],"assignment of non-integer value");
-          // break;
-        // case WriteK:
-          // if (t->child[0]->type != Integer)
-            // typeError(t->child[0],"write of non-integer value");
-          // break;
-        // case RepeatK:
-          // if (t->child[1]->type == Integer)
-            // typeError(t->child[1],"repeat test is not Boolean");
-          // break;
-        // default:
-          // break;
-      // }
-      // break;
-    // default:
-      // break;
-
-  // }
-}
 
 /* Procedure typeCheck performs type checking 
  * by a postorder syntax tree traversal

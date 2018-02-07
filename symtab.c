@@ -55,8 +55,7 @@ typedef struct BucketListRec
 	char * scope;
     LineList lines;
     int memloc; /* memory location for variable */
-	NodeKind nodekind;
-    union { StmtKind stmt; ExpKind exp; SystemKind sys; TypeKind type; DeclKind decl;} kind;
+	TypeKind type;
     struct BucketListRec * next;
 } * BucketList;
 
@@ -71,7 +70,7 @@ static BucketList hashTable[SIZE];
  * loc = memory location is inserted only the
  * first time, otherwise ignored
  */
-void st_insert(char * name, char* scope,  int lineno, int loc)
+void st_insert(char * name, char* scope,  int lineno, int loc, TypeKind type)
 {
     int h = hash(name);
     BucketList l = hashTable[h];
@@ -83,6 +82,7 @@ void st_insert(char * name, char* scope,  int lineno, int loc)
         l->lines->lineno = lineno;
         l->memloc = loc;
 		l->scope = scope;
+		l->type = type;
         l->lines->next = NULL;
         l->next = hashTable[h];
         hashTable[h] = l;
@@ -107,8 +107,44 @@ int st_lookup(char * name, char * scope)
     while ((l != NULL) && (strcmp(name, l-> name) != 0))
         l = l-> next;
     if (l == NULL) return -1;
-    else if(strcmp(l->scope, scope) == 0 || strcmp (l->scope, "global")) return -2;
+    else if(strcmp(l->scope, scope) == 0 || strcmp (l->scope, "global") == 0) return -2;
 	else return l-> memloc;
+}
+
+/*
+ * st_lookup_main() looks for a declaration of
+ * main function in the symbolTable. 
+ * return -2 if theres no mention of main
+ * in a global scope
+ * returns -1 if theres no mention of main at all.
+ */
+
+int st_lookup_main() 
+{
+    int h = hash("main");
+    BucketList l = hashTable[h];
+    while ((l != NULL) && (strcmp("main", l-> name) != 0))
+        l = l-> next;
+    if (l == NULL) return -1;
+    else if(strcmp (l->scope, "global") == 0) return -2;
+	else return l-> memloc;
+}
+
+/* Function st_lookup_type returns the type 
+ * of return value of a function.
+ */
+TypeKind st_lookup_type(char * name, char * scope) 
+{
+	
+    int h = hash(name);
+    BucketList l = hashTable[h];
+    while ((l != NULL) && (strcmp(name, l-> name) != 0)){
+        l = l-> next;
+	}
+    if (l == NULL) {
+		return NotAType; 
+	}
+	else return l->type;
 }
 
 /* Procedure printSymTab prints a formatted 

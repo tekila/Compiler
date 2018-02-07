@@ -219,7 +219,7 @@ params_lista: params_lista COMMA param
 					
 				}
 			;
-param 		: tipo id 
+param 		: tipo id {savedName = copyString(tokenString);}
 				{ /*toda vez que le um ID ou NUM precisa guardar o nome dele*/
 					if(SintaxDebug) printf("param -> tipo_especificador ID\n");
 					$$ = $1;
@@ -239,11 +239,18 @@ param 		: tipo id
 				LSQR RSQR
 				{
 					if(SintaxDebug)printf("param -> tipo_especificador ID LSQRBRA RSQRBRA\n");
-					TreeNode * t = newDeclNode(ArrayParK);
-					t->attr.name = savedName;
-					t->lineno = savedLineNo;
-					$$=$1;
-					$$->child[0] = $2;
+					// TreeNode * t = newDeclNode(ArrayParK);
+					// t->attr.name = savedName;
+					// t->
+					// t->lineno = savedLineNo;
+					// $$=$1;
+					// $$->child[0] = $2;
+					// $$->child[0]->scope = savedScope;
+					// $$->child[0]->Type = $$->Type;
+					$$->child[0] = newDeclNode(ArrayParK);
+					$$->child[0]->kind.decl = ArrayParK;
+					$$->child[0]->attr.name = $2->attr.name;
+					$$->child[0]->lineno = $2->lineno;
 					$$->child[0]->scope = savedScope;
 					$$->child[0]->Type = $$->Type;
 				}
