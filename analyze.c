@@ -90,7 +90,7 @@ static int treatChainedOps(TreeNode * t)
 			else
 			{
 				//ERROR: typecheck detected something other than Int.
-				fprintf(listing,"::::ERROR 1:::: Operation with void. Line %d:\n", t->lineno);
+				fprintf(listing,"::::ERROR 1:::: Operation with void. Line %d\n", t->lineno);
 				Error = TRUE;
 				return 0;
 			}
@@ -128,14 +128,14 @@ static void insertNode( TreeNode * t)
 							//if the righthand side has a function, then search for the return value in the symbol table
 							TypeKind returnType = st_lookup_type(t->child[1]->attr.name, t->child[1]->scope);
 							if(returnType != Integer){
-								fprintf(listing,"::::ERROR 2-a:::: Integer receiving function void return. Line %d:\n", t->lineno);
+								fprintf(listing,"::::ERROR 2-a:::: Integer receiving function void return. Line %d\n", t->lineno);
 								Error = TRUE;
 							}
 						}
 						else if(t->child[1]->Type == Void && t->child[1]->kind.exp != OpK)
 						{
 							//Invalid assignment, show error
-							fprintf(listing,"::::ERROR 2-b:::: Integer receiving void return. Line %d:\n", t->lineno);
+							fprintf(listing,"::::ERROR 2-b:::: Integer receiving void return. Line %d\n", t->lineno);
 							Error = TRUE;
 						}
 						
@@ -143,7 +143,7 @@ static void insertNode( TreeNode * t)
 					else
 					{
 						//lefthand side not a variable. Show error.
-						fprintf(listing,"::::ERROR 3:::: Lefthand side of ASSIGN is not a variable. Line %d:\n",t->lineno);
+						fprintf(listing,"::::ERROR 3:::: Lefthand side of ASSIGN is not a variable. Line %d\n",t->lineno);
 						Error = TRUE;
 					}
 					break;
@@ -170,7 +170,7 @@ static void insertNode( TreeNode * t)
 					if(st_lookup(t->attr.name, t->scope) == -1)
 					{
 						//Not in the table. Activation without declaration.
-						fprintf(listing,"::::ERROR 4:::: Variable %s in %s scope used without declaration. Line %d:\n",t->attr.name, t->scope,  t->lineno);
+						fprintf(listing,"::::ERROR 4:::: Variable '%s' in '%s' scope used without declaration. Line %d\n",t->attr.name, t->scope,  t->lineno);
 						Error = TRUE;
 					}
 					break;
@@ -197,7 +197,7 @@ static void insertNode( TreeNode * t)
 					if( st_lookup_return == -1)
 					{
 						//Not in the table. Activation without declaration.
-						fprintf(listing,"::::ERROR 5:::: Function %s in %s Scope used without declaration. Line: %d\n",t->attr.name, t->scope,  t->lineno);
+						fprintf(listing,"::::ERROR 5:::: Function '%s' in '%s' Scope used without declaration. Line %d\n",t->attr.name, t->scope,  t->lineno);
 						Error = TRUE;
 					}
 					break;
@@ -208,7 +208,10 @@ static void insertNode( TreeNode * t)
 			}
 			break;
 		case SysK:
-			printf("TODO: Inserting SysK\n"); break;
+			{
+				//printf("TODO: Inserting SysK\n"); 
+				break;
+			}
 		case DeclK:
 			{
 				switch (t->kind.decl)
@@ -222,12 +225,22 @@ static void insertNode( TreeNode * t)
 						//found a var declaration. must know if its already in the table.
 						if(st_lookup_return == -2) //theres another variable here with the same scope
 						{
-							fprintf(listing,"::::ERROR 6:::: Variable %s uses same name, in the same scope, as another identifier. Line %d:\n",t->attr.name, t->lineno);
+							fprintf(listing,"::::ERROR 6:::: Variable '%s' in scope '%s' uses same name, in the same scope, as another identifier. Line %d\n",t->attr.name, t->scope,  t->lineno);
 							Error = TRUE;						
-						}
-						if(st_lookup_return == -1) //theres not another variable. must insert
+						} else if(st_lookup_return == -1) //theres not another variable. must insert
 						{
-							st_insert(t->attr.name, t->scope, t->lineno, location++, t->Type);
+							//before inserting, check if its declared as integer.
+							if(t->Type == Integer) st_insert(t->attr.name, t->scope, t->lineno, location++, t->Type);
+							else
+							{
+								fprintf(listing,"::::ERROR 9:::: Variable '%s' in scope '%s' type is invalid. Used 'void', which is only valid for functions. Line %d\n",t->attr.name, t->scope, t->lineno);
+								Error = TRUE;
+							}
+						}
+						else //theres another variable on the table
+						{
+							fprintf(listing,"::::ERROR 10:::: Variable '%s' in scope '%s' uses same name, in the another scope, as another identifier. Line %d\n",t->attr.name, t->scope, t->lineno);
+							Error = TRUE;						
 						}
 						break;
 					}
@@ -237,13 +250,19 @@ static void insertNode( TreeNode * t)
 						//found a var declaration. must know if its already in the table.
 						if(st_lookup_return == -2) //theres another variable here with the same scope
 						{
-							fprintf(listing,"::::ERROR 7:::: Function %s uses same name, in the same scope, as another idenfier. Line %d:\n",t->attr.name, t->lineno);
+							fprintf(listing,"::::ERROR 7:::: Function '%s' in scope '%s' uses same name, in the another scope, as another idenfier. Line %d:\n",t->attr.name, t->scope,  t->lineno);
 							Error = TRUE;						
 						}
-						if(st_lookup_return == -1) //theres not another variable. must insert
+						else if(st_lookup_return == -1) //theres not another variable. must insert
 						{
 							st_insert(t->attr.name, t->scope, t->lineno, location++,  t->Type);
 							if(SemanticDebug) printf("Function inserted: %s\n", t->attr.name);
+						} else 
+						{
+							{
+							fprintf(listing,"::::ERROR 11:::: Function '%s' in scope '%s' uses same name, in the same scope, as another idenfier. Line %d:\n",t->attr.name, t->scope, t->lineno);
+							Error = TRUE;						
+							}
 						}
 					}
 				}

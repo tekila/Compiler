@@ -7,7 +7,7 @@ int gdc(int u, int v)
 
 void foo(void)
 {
-	
+	int foo;
 }
 
 void main (void)
