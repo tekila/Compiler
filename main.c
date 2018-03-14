@@ -44,7 +44,7 @@ int TraceParse = TRUE;
 int TraceAnalyze = TRUE;
 int TraceCode = FALSE;
 int SintaxDebug = TRUE;
-int GeneralDebug = TRUE;
+int GeneralDebug = FALSE;
 int SemanticDebug = TRUE;
 
 int Error = FALSE;
@@ -82,9 +82,6 @@ int main( int argc, char * argv[] )
 	if (! Error)
 	{ if (TraceAnalyze) fprintf(listing,"\nBuilding Symbol Table...\n");
 			buildSymtab(syntaxTree);
-		// if (TraceAnalyze) fprintf(listing,"\nChecking Types...\n");
-			// typeCheck(syntaxTree);
-		// if (TraceAnalyze) fprintf(listing,"\nType Checking Finished\n");
 	}
 	#if !NO_CODE
 	if (! Error)

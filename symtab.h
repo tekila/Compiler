@@ -18,16 +18,18 @@
  * loc = memory location is inserted only the
  * first time, otherwise ignored
  */
-void st_insert(char * name, char* scope,  int lineno, int loc, TypeKind type);
+void st_insert(char * name, char* scope,  int lineno, int loc, TypeKind type, DeclKind kind);
 
 /* Function st_lookup returns the memory 
  * location of a variable or -1 if not found
  */
-int st_lookup ( char * name, char * scope );
+int st_lookup ( char * name, char * scope, DeclKind kind );
 
 int st_lookup_main ( );
 
-TypeKind st_lookup_type ( char * name, char * scope );
+int st_lookup_var_fun_same_name(char* name, DeclKind kind);
+
+TypeKind st_lookup_type ( char * name, char * scope, DeclKind kind );
 
 /* Procedure printSymTab prints a formatted 
  * listing of the symbol table contents 

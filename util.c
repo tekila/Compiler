@@ -11,6 +11,14 @@
 /* Procedure printToken prints a token 
  * and its lexeme to the listing file
  */
+ 
+ char* returnType(TypeKind t)
+ {
+	 if(t == Integer) return "integer";
+	 if(t == Void) return "void";
+	 if(t == NotAType) return "not a type";
+ }
+ 
 void printToken( TokenType token, const char* tokenString )
 {
 	switch (token)

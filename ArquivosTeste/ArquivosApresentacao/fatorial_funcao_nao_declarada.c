@@ -1,5 +1,5 @@
 int fatorial(int contador, int n){
-	resultado;
+	int resultado;
 	contador = contador + 1;
 	if (contador < n){
 		resultado = fatorial(contador);
@@ -10,12 +10,14 @@ int fatorial(int contador, int n){
 	}
 	
 }
+
 void main(void){
   int n;
-  int saidamul;
+  int a;
   int resultado;
+  int saidamul;
   int contador;
   contador = 0;
-  n = 5;
+  n = abcd();
   saidamul = fatorial(contador);
 }

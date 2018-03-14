@@ -9,6 +9,7 @@
 #include "globals.h"
 #include "symtab.h"
 #include "analyze.h"
+#include "util.h"
 
 /* counter for variable memory locations */
 static int location = 0;
@@ -126,9 +127,9 @@ static void insertNode( TreeNode * t)
 						if(t->child[1]->kind.exp == FunIdK)
 						{
 							//if the righthand side has a function, then search for the return value in the symbol table
-							TypeKind returnType = st_lookup_type(t->child[1]->attr.name, t->child[1]->scope);
-							if(returnType != Integer){
-								fprintf(listing,"::::ERROR 2-a:::: Integer `%s` receiving function `%s` void return. Line %d:\n", t->child[0]->attr.name, t->child[1]->attr.name, t->lineno);
+							TypeKind returnType = st_lookup_type(t->child[1]->attr.name,"global", t->child[1]->kind.decl);
+							if(returnType == Void){
+								fprintf(listing,"::::ERROR 2-a:::: Integer `%s` receiving function `%s` which returns void. Line %d:\n", t->child[0]->attr.name, t->child[1]->attr.name, t->lineno);
 								Error = TRUE;
 							}
 						}
@@ -167,7 +168,7 @@ static void insertNode( TreeNode * t)
 					//finding an IdK means we found a variable that should`ve been declared
 					//earlier in the code. This means we have to check if it has been declared
 					//indeed. Show error if it hasn`t been.
-					if(st_lookup(t->attr.name, t->scope) == -1)
+					if(st_lookup(t->attr.name, t->scope, t->kind.exp) == -1)
 					{
 						//Not in the table. Activation without declaration.
 						fprintf(listing,"::::ERROR 4:::: Variable `%s` in `%s` scope used without declaration. Line %d:\n",t->attr.name, t->scope,  t->lineno);
@@ -193,11 +194,11 @@ static void insertNode( TreeNode * t)
 				}
 				case FunIdK:
 				{
-					int st_lookup_return = st_lookup(t->attr.name, t->scope);
+					int st_lookup_return = st_lookup(t->attr.name, "global", t->kind.decl);
 					if( st_lookup_return == -1)
 					{
 						//Not in the table. Activation without declaration.
-						fprintf(listing,"::::ERROR 5:::: Function %s in %s Scope used without declaration. Line: %d\n",t->attr.name, t->scope,  t->lineno);
+						fprintf(listing,"::::ERROR 5:::: Function `%s` in %s Scope used without declaration. Line: %d\n",t->attr.name, t->scope,  t->lineno);
 						Error = TRUE;
 					}
 					break;
@@ -218,12 +219,14 @@ static void insertNode( TreeNode * t)
 					case ArrayParK:
 					case VarK:
 					{
-						int st_lookup_return = st_lookup(t->attr.name, t->scope);
+						
 						
 						//found a var declaration. must know if its already in the table.
+						int st_lookup_return = st_lookup(t->attr.name, t->scope, t->kind.decl);
+						int st_lookup_global = st_lookup_var_fun_same_name(t->attr.name, t->kind.decl);
 						if(st_lookup_return == -2) //theres another variable here with the same scope
 						{
-							fprintf(listing,"::::ERROR 6:::: Variable %s uses same name, in the same scope, as another identifier. Line %d:\n",t->attr.name, t->lineno);
+							fprintf(listing,"::::ERROR 6:::: Variable `%s` uses same name as another identifier. Line %d:\n",t->attr.name, t->lineno);
 							Error = TRUE;						
 						}
 						if(st_lookup_return == -1) //theres not another variable. must insert
@@ -231,23 +234,38 @@ static void insertNode( TreeNode * t)
 							if(t->Type == Void)
 							{
 								fprintf(listing,"::::ERROR 9:::: Variable `%s` declared as void. Line %d:\n",t->attr.name, t->lineno);
-							}else st_insert(t->attr.name, t->scope, t->lineno, location++, t->Type);
+								Error  = TRUE;
+							}else 
+							{
+								if(st_lookup_global == -2)
+								{
+									fprintf(listing,"::::ERROR 6:::: Variable `%s` uses same name as another identifier. Line %d:\n",t->attr.name, t->lineno);
+							Error = TRUE;
+								}
+								st_insert(t->attr.name, t->scope, t->lineno, location++, t->Type, t->kind.decl);
+								// if(SemanticDebug) printf("IdK inserted: %s\n", t->attr.name);
+							}
 						}
 						break;
 					}
 					case FunK:
 					{
-						int st_lookup_return = st_lookup(t->attr.name, t->scope);
-						//found a var declaration. must know if its already in the table.
+						//found a function declaration. must know if its already in the table.
+						int st_lookup_return = st_lookup(t->attr.name, "global", t->kind.decl);
+						int st_lookup_global = st_lookup_var_fun_same_name(t->attr.name, t->kind.decl);
 						if(st_lookup_return == -2) //theres another variable here with the same scope
 						{
-							fprintf(listing,"::::ERROR 7:::: Function %s uses same name, in the same scope, as another idenfier. Line %d:\n",t->attr.name, t->lineno);
+							fprintf(listing,"::::ERROR 7:::: Function %s uses same name as another identifier. Line %d:\n",t->attr.name, t->lineno);
 							Error = TRUE;						
 						}
 						if(st_lookup_return == -1) //theres not another variable. must insert
 						{
-							st_insert(t->attr.name, t->scope, t->lineno, location++,  t->Type);
-							if(SemanticDebug) printf("Function inserted: %s\n", t->attr.name);
+							if(st_lookup_global == -2)
+							{
+								fprintf(listing,"::::ERROR 7:::: Function %s uses same name as another identifier. Line %d:\n",t->attr.name, t->lineno);
+								Error = TRUE;	
+							}else st_insert(t->attr.name, "global", t->lineno, location++,  t->Type, t->kind.decl);
+							// if(SemanticDebug) printf("Function inserted: %s as %s\n", t->attr.name, returnType(t->Type));
 						}
 					}
 				}
@@ -267,10 +285,7 @@ void verifyMain()
 	if(main == -1)
 	{
 		fprintf(listing,"::::ERROR 8-a:::: Function 'main' not found.\n");
-	}
-	if(main == -2)
-	{
-		fprintf(listing,"::::ERROR 8-b:::: Function 'main' not found in global scope.\n");
+		Error = 1;
 	}
 }
 
@@ -283,8 +298,16 @@ void buildSymtab(TreeNode * syntaxTree)
 	verifyMain();
 	if (TraceAnalyze)
 	{ 
-		fprintf(listing,"\nSymbol table:\n\n");
-		printSymTab(listing);
+		
+		if(!Error){
+			fprintf(listing,"\nSymbol table:\n\n");
+			printSymTab(listing);
+		}
+		else 
+		{
+			printf("Compilation Error: check log\n");
+			exit(1);
+		}
 	}
 }
 

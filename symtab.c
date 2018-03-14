@@ -22,7 +22,7 @@
 #define SHIFT 4
 
 /* the hash function */
-static int hash(char * key)
+static int __hash(char * key)
 {
     int temp = 0;
     int i = 0;
@@ -32,6 +32,15 @@ static int hash(char * key)
         ++i;
     }
     return temp;
+}
+
+static int hash(char * name, char* scope)
+{
+	char* key = malloc(strlen(name)+strlen(scope)+1);
+	strcpy(key, name);
+	strcat(key, scope);
+    
+    return __hash(key);
 }
 
 /* the list of line numbers of the source 
@@ -56,6 +65,7 @@ typedef struct BucketListRec
     LineList lines;
     int memloc; /* memory location for variable */
 	TypeKind type;
+	DeclKind kind;
     struct BucketListRec * next;
 } * BucketList;
 
@@ -70,9 +80,9 @@ static BucketList hashTable[SIZE];
  * loc = memory location is inserted only the
  * first time, otherwise ignored
  */
-void st_insert(char * name, char* scope,  int lineno, int loc, TypeKind type)
+void st_insert(char * name, char* scope,  int lineno, int loc, TypeKind type, DeclKind kind)
 {
-    int h = hash(name);
+    int h = hash(name, scope);
     BucketList l = hashTable[h];
     while ((l != NULL) && (strcmp(name, l->name) != 0)) l = l->next;
     if (l == NULL) /* variable not yet in table */ {
@@ -83,6 +93,7 @@ void st_insert(char * name, char* scope,  int lineno, int loc, TypeKind type)
         l->memloc = loc;
 		l->scope = scope;
 		l->type = type;
+		l->kind = kind;
         l->lines->next = NULL;
         l->next = hashTable[h];
         hashTable[h] = l;
@@ -93,6 +104,7 @@ void st_insert(char * name, char* scope,  int lineno, int loc, TypeKind type)
         t-> next-> lineno = lineno;
         t-> next-> next = NULL;
     }
+	if(GeneralDebug)printf("inserted %s of scope %s\n", name, scope);
 } /* st_insert */
 
 /* Function st_lookup returns the memory 
@@ -100,16 +112,47 @@ void st_insert(char * name, char* scope,  int lineno, int loc, TypeKind type)
  * or -2 if theres another variable in the 
  * same scope with the same name.
  */
-int st_lookup(char * name, char * scope) 
+int st_lookup(char * name, char * scope, DeclKind kind) 
 {
+	if(GeneralDebug) printf("New call of st_lookup::::\n");
+    int h = hash(name, scope);
+	if(kind == FunIdK) h = hash(name, scope);
+	//if(kind == FunK) return st_verify_var_fun_same_name(name, kind);
+	//all things with the same name and scope are in the same list.
+    BucketList l = hashTable[h];
+    while ((l != NULL) && strcmp(l->name, name) != 0 )
+        l = l-> next;
+    if (l == NULL) return -1; //something called `name` with scope `scope` is not in table
+	else /*same name and scope in the table*/if(kind!= VarParK && kind != ArrayParK) return -2;
+	else return l->memloc;
+	
+}
+
+int st_lookup_var_fun_same_name(char* name, DeclKind kind)
+{
+	int i = 0;
+	for(i; i<SIZE; i++)
+	{
+		BucketList l = hashTable[i];
+		while(l!=NULL)
+		{
+			if(strcmp(name, l->name) == 0 && kind != l->kind && l->kind!=VarParK && l->kind!=ArrayParK) return -2;
+			else l = l->next;
+		}
+	}
+	return -1;
+}
+
+
+/*
+
     int h = hash(name);
     BucketList l = hashTable[h];
     while ((l != NULL) && (strcmp(name, l-> name) != 0))
         l = l-> next;
-    if (l == NULL) return -1;
+    if (l == NULL) return -1; //not in table
     else if(strcmp(l->scope, scope) == 0 || strcmp (l->scope, "global") == 0) return -2;
-	else return l-> memloc;
-}
+	else return l-> memloc;*/
 
 /*
  * st_lookup_main() looks for a declaration of
@@ -121,24 +164,39 @@ int st_lookup(char * name, char * scope)
 
 int st_lookup_main() 
 {
-    int h = hash("main");
-    BucketList l = hashTable[h];
-    while ((l != NULL) && (strcmp("main", l-> name) != 0))
-        l = l-> next;
-    if (l == NULL) return -1;
-    else if(strcmp (l->scope, "global") == 0) return -2;
-	else return l-> memloc;
+	
+	int i = 0;
+	for(i; i<SIZE; i++)
+	{
+		BucketList l = hashTable[i];
+		while(l!=NULL)
+		{
+			if(strcmp("main", l->name) == 0) return -2;
+			else l = l->next;
+		}
+	}
+	return -1;
+    // int h = hash("main", "global\0");
+    // BucketList l = hashTable[h];
+    // while ((l != NULL) && (strcmp("main", l-> name) != 0))
+        // l = l-> next;
+    // if (l == NULL) return -1;
+    // else if(strcmp (l->scope, "global") == 0) return -2;
+	// else return l-> memloc;
 }
+
 
 /* Function st_lookup_type returns the type 
  * of return value of a function.
  */
-TypeKind st_lookup_type(char * name, char * scope) 
+TypeKind st_lookup_type(char * name, char * scope, DeclKind kind) 
 {
 	
-    int h = hash(name);
+    int h = hash(name, scope);
+	//if(kind == FunIdK) h = hash(name, scope);
     BucketList l = hashTable[h];
     while ((l != NULL) && (strcmp(name, l-> name) != 0)){
+		if(GeneralDebug)printf("st_lookup_type::: \n\tlooking at %s.\n\tlooking for %s\n", l->name, name);
         l = l-> next;
 	}
     if (l == NULL) {
@@ -146,6 +204,10 @@ TypeKind st_lookup_type(char * name, char * scope)
 	}
 	else return l->type;
 }
+
+
+
+
 
 /* Procedure printSymTab prints a formatted 
  * listing of the symbol table contents 
