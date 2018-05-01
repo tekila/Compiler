@@ -104,7 +104,7 @@ void st_insert(char * name, char* scope,  int lineno, int loc, TypeKind type, De
         t-> next-> lineno = lineno;
         t-> next-> next = NULL;
     }
-	if(GeneralDebug)printf("inserted %s of scope %s\n", name, scope);
+	
 } /* st_insert */
 
 /* Function st_lookup returns the memory 
@@ -216,21 +216,23 @@ TypeKind st_lookup_type(char * name, char * scope, DeclKind kind)
 void printSymTab(FILE * listing) 
 {
     int i;
-    fprintf(listing, "Variable Name  Location   Line Numbers    Scope\n");
-    fprintf(listing, "-------------  --------   ------------   -------\n");
+    fprintf(listing, "Variable Name | Location |  Scope   |  Line Numbers   \n");
+    fprintf(listing, "------------- | -------- | -------- |  ------------\n");
     for (i = 0; i < SIZE; ++i) {
         if (hashTable[i] != NULL) {
             BucketList l = hashTable[i];
             while (l != NULL) {
                 LineList t = l->lines;
-                fprintf(listing, "%-14s ", l->name);
-                fprintf(listing, "%-8d  ", l->memloc);
+                fprintf(listing, "%-14s |", l->name);
+                fprintf(listing, "%-8d |", l->memloc);
+				fprintf(listing, "%-9s |", l->scope);
+				fprintf(listing, "%d", t->lineno);
+				t = t->next;
                 while (t != NULL) {
-                    fprintf(listing, "%-14d ", t->lineno);
+                    fprintf(listing, ",%d", t->lineno);
                     t = t->next;
                 }
-				fprintf(listing, "%s   ", l->scope);
-                fprintf(listing, "\n");
+				fprintf(listing, "\n");
                 l = l->next;
             }
         }

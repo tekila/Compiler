@@ -173,6 +173,9 @@ static void insertNode( TreeNode * t)
 						//Not in the table. Activation without declaration.
 						fprintf(listing,"::::ERROR 4:::: Variable `%s` in `%s` scope used without declaration. Line %d:\n",t->attr.name, t->scope,  t->lineno);
 						Error = TRUE;
+					} else //if theres no error, then we should insert in on the table
+					{
+						st_insert(t->attr.name, t->scope, t->lineno, location, t->Type, t->kind.decl);
 					}
 					break;
 				}

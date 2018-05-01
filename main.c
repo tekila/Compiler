@@ -43,9 +43,9 @@ int TraceScan = FALSE;
 int TraceParse = TRUE;
 int TraceAnalyze = TRUE;
 int TraceCode = FALSE;
-int SintaxDebug = TRUE;
+int SintaxDebug = FALSE;
 int GeneralDebug = FALSE;
-int SemanticDebug = TRUE;
+int SemanticDebug = FALSE;
 
 int Error = FALSE;
 
@@ -68,7 +68,7 @@ int main( int argc, char * argv[] )
 		exit(1);
 	}
 	yyin = source;
-	listing = stdout; /* send listing to screen */
+	listing = fopen("output.txt", "w"); /* send listing to screen */
 	fprintf(listing,"\nTINY COMPILATION: %s\n",pgm);
 	#if NO_PARSE
 	while (getToken()!=ENDFILE);
@@ -97,7 +97,8 @@ int main( int argc, char * argv[] )
 			printf("Unable to open %s\n",codefile);
 			exit(1);
 		}	
-		codeGen(syntaxTree,codefile);
+		//codeGen(syntaxTree,codefile);
+		generateIntermCode(syntaxTree);
 		fclose(code);
 	}
 	#endif

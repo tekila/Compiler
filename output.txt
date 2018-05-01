@@ -1,0 +1,90 @@
+
+TINY COMPILATION: ArquivosTeste/fatorial.c
+
+Syntax tree:
+  Integer Type
+    FunK: fatorial at Scope:: fatorial :: Return Type: Integer
+      Integer Type
+        VarParK: contador at Scope:: fatorial
+      Integer Type
+        VarParK: n at Scope:: fatorial
+      Integer Type
+        VarK: resultado at Scope:: fatorial :: Data type: Integer
+      Assign:
+        Id: contador at Scope:: fatorial
+        Op: +
+          Id: contador at Scope:: fatorial
+          Const: 1
+      If:
+        Op: <
+          Id: contador at Scope:: fatorial
+          Id: n at Scope:: fatorial
+        Assign:
+          Id: resultado at Scope:: fatorial
+          FunId: fatorial at Scope:: fatorial
+            Id: contador at Scope:: fatorial
+        Assign:
+          Id: contador at Scope:: fatorial
+          Op: *
+            Id: contador at Scope:: fatorial
+            Id: resultado at Scope:: fatorial
+        Return:
+          Id: contador at Scope:: fatorial
+        Return:
+          Id: contador at Scope:: fatorial
+  Void Type
+    FunK: main at Scope:: main :: Return Type: Not Integer
+      Integer Type
+        VarK: n at Scope:: main :: Data type: Integer
+      Integer Type
+        VarK: saidamul at Scope:: main :: Data type: Integer
+      Integer Type
+        VarK: contador at Scope:: main :: Data type: Integer
+      Integer Type
+        ArrayK: array at Scope:: main 
+          SizeK: 5 at Scope:: main
+      Assign:
+        IdArrayK: array at Scope:: main
+          Const: 4
+        Const: 5
+      Assign:
+        Id: contador at Scope:: main
+        Const: 0
+      Assign:
+        Id: n at Scope:: main
+        Const: 5
+      Assign:
+        Id: saidamul at Scope:: main
+        FunId: fatorial at Scope:: main
+          Id: contador at Scope:: main
+      Assign:
+        Id: n at Scope:: main
+        Op: +
+          Id: n at Scope:: main
+          Const: 1
+      Assign:
+        Id: n at Scope:: main
+        Op: +
+          Id: saidamul at Scope:: main
+          Id: contador at Scope:: main
+      Assign:
+        Id: contador at Scope:: main
+        Op: +
+          Id: n at Scope:: main
+          Const: 2
+
+Building Symbol Table...
+
+Symbol table:
+
+Variable Name | Location |  Scope   |  Line Numbers   
+------------- | -------- | -------- |  ------------
+resultado      |3        |fatorial  |2,5,6
+main           |4        |global    |18
+n              |2        |fatorial  |0,4
+fatorial       |0        |global    |2
+saidamul       |6        |main      |15,21,23
+array          |8        |main      |17,18
+contador       |1        |fatorial  |0,3,3,4,5,6,6,7,9
+n              |5        |main      |14,20,22,22,23,24
+contador       |7        |main      |16,19,21,23,24

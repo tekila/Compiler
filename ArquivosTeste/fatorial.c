@@ -14,7 +14,12 @@ void main(void){
   int n;
   int saidamul;
   int contador;
+  int array[5];
+  array[4] = 5;
   contador = 0;
   n = 5;
   saidamul = fatorial(contador);
+  n = n+1;
+  n = saidamul + contador;
+  contador = n+2;
 }
